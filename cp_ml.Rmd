@@ -4,7 +4,7 @@ author: "Sunny Khosla"
 date: "Saturday, July 25, 2015"
 output: html_document
 ---
-```{r, Global settings, echo=TRUE} 
+```{r, Global settings, echo=FALSE} 
             library(curl) # on R console do install.packages("curl")
             library(caret) # on R console do install.packages("caret") & install.packages('e1071', dependencies=TRUE)
             library(rpart)
@@ -27,7 +27,7 @@ SUMMARY -
 EXPLORATORY DATA ANALYSIS - 
 The training data set was initially analyzed for existense of NA values and character values. Once determined that these were not needed the columns were removed. The original 160 columns were reduced to a much smaller set containing only 50 columns
 
-```{r, exploratory data analysis, echo=TRUE }
+```{r, exploratory data analysis, echo=FALSE }
         # Download training file in case it's not on current directory
             down_load_train_file <- "pml-training.csv"
             url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
@@ -68,7 +68,7 @@ The training data set was initially analyzed for existense of NA values and char
 PARTITION DATA - 
 The training data set is partitioned into a training and test piece used for training the models and development of error/accuracy estimates
 
-```{r, data partitioning, echo=TRUE}
+```{r, data partitioning, echo=FALSE}
         # partition data
             train_partitioned <- createDataPartition( y=train_selects$classe, p=0.75, list=FALSE)
             train_train <- train_selects[ train_partitioned,]
@@ -78,10 +78,12 @@ The training data set is partitioned into a training and test piece used for tra
         cat( "dimensions of test piece of partitioned training set = ",  dim(train_test) )
 ```
 
+
+
 OUT OF SAMPLE ERROR/ACCURACY ESTIMATES - 
 Two approaches are taken here. First, the partitioned training data is used to get an estimate of the error/accuracy. 
 
-```{r, accuracy estimation, echo=TRUE}
+```{r, accuracy estimation, echo=FALSE, warning=FALSE, message=FALSE}
                 set.seed(1234)
             # try "rpart" - 60 % on train data, 58 % on test data
                 m1 <- train( classe ~., method="rpart", data=train_train )
@@ -94,35 +96,36 @@ Two approaches are taken here. First, the partitioned training data is used to g
                 lda_test <- confusionMatrix( train_test$classe, predict(m2, train_test))
             
             # try "gbm" - 96 % on train data, 95 % on test data ( 22 min run time )
-                # m3 <- train( classe ~., method="gbm", data=train_train )
-                # confusionMatrix( train_train$classe, predict(m3, train_train))
-                # confusionMatrix( train_test$classe, predict(m3, train_test))
-    
+                m3 <- train( classe ~., method="gbm", data=train_train, verbose=FALSE )
+                gbm_train <- confusionMatrix( train_train$classe, predict(m3, train_train))
+                gbm_test <- confusionMatrix( train_test$classe, predict(m3, train_test))
+                    
+                cat("NOTE - Please interpret Accuracies as Accuracy = 1 - Error")
                 cat("Model RPART Accuracy on train data=", round(rpart_train$overall[1],2),"& Accuracy on test data=",round(rpart_test$overall[1],2) )
             cat("Model LDA Accuracy on train data=", round(lda_train$overall[1],2),"& Accuracy on test data=",round(lda_test$overall[1],2) )
-            cat("Model GBM Accuracy on train data= 0.96", "& Accuracy on test data= 0.95 ")
+            cat("Model GBM Accuracy on train data=", round(gbm_train$overall[1],2),"& Accuracy on test data=", round(gbm_test$overall[1],2))
 
 ```
 
 
+
 CROSS VALIDATION - 
 Second, the trainControl() function was used to perform a repeated, k-fold cross validaton
-```{r, cross validation, echo=TRUE}
+```{r, cross validation, echo=FALSE, warning=FALSE, message=FALSE}
 
-            # try "gbm" on full set - 96 % on train data, 95 % on test data ( 22 min run time )
+            # try "gbm" on full set - 96 % on train data, 95 % on test data ( 22 min run time, hence not running )
              #   m33 <- train( classe ~., method="gbm", data=train_selects )
              #   confusionMatrix( train_selects$classe, predict(m33, train_selects))
              #   answer_1 <- predict( m33, newdata = test_data)
             
             # try "gbm" on full set - using train control
-             # train_control <- trainControl( method="repeatedcv", number=10, repeats=3 )
-             # m34 <- train( classe ~., method="gbm", data=train_selects, trControl=train_control)
+             train_control <- trainControl( method="repeatedcv", number=10, repeats=3 )
+             m34 <- train( classe ~., method="gbm", data=train_selects, trControl=train_control, verbose=FALSE)
              # confusionMatrix( train_selects$classe, predict(m34, train_selects))
              
     
-        cat(" Model GBM with repeated k-fold cross validation on entire training data set gives Accuracies")
-        cat(" 0.72, 0.84, 0.88, 0.80, 0.90, 0.93, 0.84, 0.92, 0.95")
-        # cat(" values=", round( m34$results$Accuracy, 2 )
+        cat(" Model GBM with repeated k-fold cross validation on entire training data set gives Accuracies (1-Error)")
+        cat(" values=", round( m34$results$Accuracy, 2 ) )
 ```
 
 
@@ -130,15 +133,17 @@ Second, the trainControl() function was used to perform a repeated, k-fold cross
 MODEL SELECTION STRATEGY - 
 Based on accuracies generated on applying different models, the GBM model was chosen to evaluate the Project test case. 
 
-```{r, model application to test case, echo=TRUE}
+```{r, model application to test case, echo=FALSE}
     
-        # answer <- predict( m34, newdata = test_data)
+        answer <- predict( m34, newdata = test_data)
 
 ```
 
+
+
 GENERATING OUTPUT FILE - Based on script provided by Project writeups an output file is generated
 
-```{r, generate output file, echo=TRUE }
+```{r, generate output file, echo=FALSE }
                 pml_write_files = function(x){
                     n = length(x)
                     for(i in 1:n){
