@@ -77,13 +77,13 @@ img {
 <pre><code>## dimensions of training piece of partitioned training set =  14718 50</code></pre>
 <pre><code>## dimensions of test piece of partitioned training set =  4904 50</code></pre>
 <p>OUT OF SAMPLE ERROR/ACCURACY ESTIMATES - Two approaches are taken here. First, the partitioned training data is used to get an estimate of the error/accuracy.</p>
-<pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## Model RPART Accuracy on train data= 0.5 &amp; Accuracy on test data= 0.5</code></pre>
-<pre><code>## Model LDA Accuracy on train data= 0.7 &amp; Accuracy on test data= 0.69</code></pre>
-<pre><code>## Model GBM Accuracy on train data= 0.96 &amp; Accuracy on test data= 0.95</code></pre>
+<pre><code>## NOTE - Please interpret Accuracies as Accuracy = 1 - Error</code></pre>
+<pre><code>## Model RPART Accuracy on train data= 0.43 &amp; Accuracy on test data= 0.43</code></pre>
+<pre><code>## Model LDA Accuracy on train data= 0.7 &amp; Accuracy on test data= 0.7</code></pre>
+<pre><code>## Model GBM Accuracy on train data= 0.97 &amp; Accuracy on test data= 0.95</code></pre>
 <p>CROSS VALIDATION - Second, the trainControl() function was used to perform a repeated, k-fold cross validaton</p>
-<pre><code>##  Model GBM with repeated k-fold cross validation on entire training data set gives Accuracies</code></pre>
-<pre><code>##  values= 0.73 0.84 0.89 0.8 0.9 0.93 0.84 0.92 0.95</code></pre>
+<pre><code>##  Model GBM with repeated k-fold cross validation on entire training data set gives Accuracies (1-Error)</code></pre>
+<pre><code>##  values= 0.73 0.84 0.88 0.8 0.9 0.93 0.84 0.92 0.95</code></pre>
 <p>MODEL SELECTION STRATEGY - Based on accuracies generated on applying different models, the GBM model was chosen to evaluate the Project test case.</p>
 <p>GENERATING OUTPUT FILE - Based on script provided by Project writeups an output file is generated</p>
 <p>CONCLUSIONS - The GBM model gives excellent results - 100 %. All the test cases provided in the Course Project Submission evaluated correctly.</p>
